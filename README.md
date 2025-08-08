@@ -25,14 +25,6 @@ retail_recommendation_app/
 └── README.md
 ```
 
----
-
-## 📸 Example Screenshot (Web Arayüzü Örneği)
-
-> 📷 Example screenshot of the web interface:  
-> (Web arayüzüne ait örnek ekran görüntüsü)
-
-![Demo](images5/demo.png)
 
 ---
 
@@ -165,6 +157,13 @@ The following files were **excluded from GitHub** due to large size:
 - Trained model → `models/`
 
 Aksi takdirde kodlar hata verecektir.
+
+---
+
+## 📸 Example Screenshot (Web Arayüzü Örneği)
+
+
+![Demo](images5/demo.png)
 
 ---
 
