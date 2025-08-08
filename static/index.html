@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr" x-data="themeSwitcher()" :class="dark ? 'dark' : ''" class="transition-colors duration-300">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Akıllı Öneri Sistemi</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- AOS for scroll animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papLWY9ZfKmwQJmuWPOngZ3UAGoynQoI3Do6QHOEGI2dqOei9UMZpYdgwMZX4x5C/Bph6XPHd72/EOw0v8Hoqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .skeleton { @apply animate-pulse bg-gray-200 dark:bg-gray-700; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+  <!-- Navbar -->
+  <header class="fixed w-full bg-white/70 dark:bg-gray-800/70 backdrop-blur z-50">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between p-4">
+      <a href="#" class="text-2xl font-bold">Öneri Sistemi</a>
+      <ul class="hidden md:flex space-x-6">
+        <li><a href="#form" class="hover:text-purple-500">Tahmin</a></li>
+        <li><a href="#result" class="hover:text-purple-500">Sonuçlar</a></li>
+        <li><a href="#about" class="hover:text-purple-500">Hakkında</a></li>
+        <li><a href="#feedback" class="hover:text-purple-500">Görüş</a></li>
+      </ul>
+      <div class="flex items-center space-x-3">
+        <button @click="toggleTheme()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <template x-if="!dark"><lucide-moon /></template>
+          <template x-if="dark"><lucide-sun /></template>
+        </button>
+        <button @click="scrollToTop()" x-show="showTop" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <lucide-arrow-up />
+        </button>
+        <button @click="menuOpen = !menuOpen" class="md:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <lucide-menu />
+        </button>
+      </div>
+    </nav>
+    <!-- Mobile Menu -->
+    <div x-show="menuOpen" class="md:hidden bg-white dark:bg-gray-800">
+      <ul class="flex flex-col p-4 space-y-2">
+        <li><a href="#form" class="block py-2">Tahmin</a></li>
+        <li><a href="#result" class="block py-2">Sonuçlar</a></li>
+        <li><a href="#about" class="block py-2">Hakkında</a></li>
+        <li><a href="#feedback" class="block py-2">Görüş</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="pt-24">
+    <!-- Hero -->
+    <section class="h-96 bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center" data-aos="fade-up">
+      <div class="text-center text-white">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">🛍️ Akıllı Ürün Öneri Sistemi</h1>
+        <p class="text-lg md:text-2xl">Sepetine göre sana en uygun ürünleri tahmin ediyoruz!</p>
+      </div>
+    </section>
+
+    <!-- Form -->
+    <section id="form" class="max-w-3xl mx-auto my-12 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg" data-aos="fade-right">
+      <form id="recommendForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1 font-medium">Kullanıcı ID</label>
+            <input type="number" id="user_id" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" value="123" required>
+          </div>
+          <div>
+            <label class="block mb-1 font-medium">Kaç öneri istiyorsun?</label>
+            <input type="number" id="top_k" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" value="3" required>
+          </div>
+        </div>
+        <div>
+          <label class="block mb-1 font-medium">Sepet (JSON)</label>
+          <textarea id="cart" rows="5" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">[
+  { "itemid": 1001, "view_count": 8, "add_count": 3, "days_in_cart": 1.5, "unique_views": 95 },
+  { "itemid": 1002, "view_count": 2, "add_count": 1, "days_in_cart": 0.2, "unique_views": 40 },
+  { "itemid": 1003, "view_count": 12, "add_count": 5, "days_in_cart": 3.0, "unique_views": 210 },
+  { "itemid": 1004, "view_count": 6, "add_count": 2, "days_in_cart": 0.9, "unique_views": 80 },
+  { "itemid": 1005, "view_count": 4, "add_count": 0, "days_in_cart": 0.1, "unique_views": 50 },
+  { "itemid": 1006, "view_count": 15, "add_count": 6, "days_in_cart": 2.5, "unique_views": 190 },
+  { "itemid": 1007, "view_count": 3, "add_count": 1, "days_in_cart": 0.7, "unique_views": 65 },
+  { "itemid": 1008, "view_count": 9, "add_count": 4, "days_in_cart": 1.8, "unique_views": 120 },
+  { "itemid": 1009, "view_count": 7, "add_count": 2, "days_in_cart": 1.0, "unique_views": 88 },
+  { "itemid": 1010, "view_count": 5, "add_count": 1, "days_in_cart": 0.5, "unique_views": 72 }
+]</textarea>
+        </div>
+        <button type="submit" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition">🔍 Önerileri Al</button>
+      </form>
+    </section>
+
+    <!-- Result -->
+    <section id="result" class="max-w-6xl mx-auto my-12 px-4" data-aos="fade-left"></section>
+
+    <!-- About -->
+    <section id="about" class="py-16 bg-gray-100 dark:bg-gray-700 text-center rounded-2xl mx-4 md:mx-auto" data-aos="fade-up">
+      <h2 class="text-3xl font-bold mb-4">ℹ️ Sistem Hakkında</h2>
+      <p class="max-w-2xl mx-auto leading-relaxed">Bu sistem, makine öğrenmesi modeli ile kullanıcıların sepetteki ürün bilgilerine göre en uygun ürünleri tahmin eder. Sepette kalma süresi, görüntülenme ve popülerlik gibi veriler kullanılır.</p>
+    </section>
+
+    <!-- Feedback -->
+    <section id="feedback" class="max-w-3xl mx-auto my-16 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg" data-aos="fade-up">
+      <h2 class="text-2xl font-bold mb-4 text-center">📬 Öneri & Geri Bildirim</h2>
+      <form class="space-y-4">
+        <input type="text" placeholder="Adınız" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <textarea rows="4" placeholder="Mesajınız" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"></textarea>
+        <button class="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg opacity-50 cursor-not-allowed" disabled>Gönder (Aktif değil)</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center">
+    © 2025 Akıllı Ürün Öneri Sistemi. Tüm hakları saklıdır.
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    lucide.createIcons();
+    AOS.init({ duration: 800, once: true });
+
+    function themeSwitcher() {
+      return {
+        dark: localStorage.getItem('theme') === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches,
+        menuOpen: false,
+        showTop: false,
+        toggleTheme() {
+          this.dark = !this.dark;
+          localStorage.setItem('theme', this.dark ? 'dark' : 'light');
+        },
+        scrollToTop() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const app = document.querySelector('[x-data]');
+      if (app) app.__x.$data.showTop = window.scrollY > 300;
+    });
+
+    document.getElementById('recommendForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const userId = +document.getElementById('user_id').value;
+      const topK = +document.getElementById('top_k').value;
+      let cart;
+      try { cart = JSON.parse(document.getElementById('cart').value); }
+      catch { return alert('❌ JSON formatı hatalı!'); }
+
+      const resultEl = document.getElementById('result');
+      resultEl.innerHTML = '<div class="skeleton p-8 rounded-lg"></div>';
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/recommend', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ user_id: userId, cart, top_k: topK })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        // Cart overview
+        const cartHtml = cart.map(item => `
+          <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <p><strong>ID:</strong> ${item.itemid}</p>
+            <p><strong>Görüntüleme:</strong> ${item.view_count}</p>
+            <p><strong>Sepete ekleme:</strong> ${item.add_count}</p>
+          </div>
+        `).join('');
+
+        // Recommendations
+        const recHtml = data.item_scores.slice(0, topK).map(([id, score]) => `
+          <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md text-center">
+            <img src="https://picsum.photos/seed/${id}/200/120" alt="Ürün" class="mx-auto mb-2 rounded-lg">
+            <h3 class="font-semibold">Ürün ${id}</h3>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full mt-2 overflow-hidden">
+              <div class="bg-green-500 h-full" style="width: ${(score*100).toFixed(0)}%"></div>
+            </div>
+            <small>${(score*100).toFixed(1)}% satın alma olasılığı</small>
+          </div>
+        `).join('');
+
+        resultEl.innerHTML = `
+          <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4">📦 Sepetindeki Ürünler</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">${cartHtml}</div>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold mb-4">✨ Önerilen Ürünler</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">${recHtml}</div>
+          </div>
+        `;
+      } catch(err) {
+        resultEl.innerHTML = `<p class="text-red-500">⚠️ ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

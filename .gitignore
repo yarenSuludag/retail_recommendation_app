@@ -1,0 +1,6 @@
+data/raw/item_properties_part1.csv
+data/raw/item_properties_part2.csv
+data/raw/events.csv
+models/model.pkl
+__pycache__/
+*.pyc
